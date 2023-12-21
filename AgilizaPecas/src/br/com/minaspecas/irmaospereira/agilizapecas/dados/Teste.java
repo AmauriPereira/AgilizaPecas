@@ -8,6 +8,12 @@ package br.com.minaspecas.irmaospereira.agilizapecas.dados;
  *
  * @author Dinopc
  */
-public class File {
-    
+
+
+public class Teste {
+
+    public static void main(String[] args) {
+        BancoDadosUtil conexaoFirebird = new BancoDadosUtil();
+        conexaoFirebird.testarConexao();
+    }
 }
