@@ -1,6 +1,7 @@
 package br.com.minaspecas.irmaospereira.agilizapecas.apresentacao;
 
 import br.com.minaspecas.irmaospereira.agilizapecas.dados.BancoDadosUtil;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +11,9 @@ public class main {
    
     public static void main(String[] variavel){ 
     executarSelect();
+    //System.out.println(System.getProperty("user.dir"));
+    //File ARQUIVO = new File("database/AGILIZA.FBD");
+    //System.out.println(ARQUIVO.getAbsolutePath());
     }
     
     private static final String SQL_SELECT_ACESSO = "SELECT * FROM ACESSO";
@@ -34,10 +38,11 @@ public class main {
                 // Exemplo: Obtendo valores das colunas
                 int id = resultSet.getInt("ID_USUARIO");
                 String nome = resultSet.getString("USUARIO");
+                String senha = resultSet.getString("SENHA");
                 String ativo = resultSet.getString("ATIVO");
 
                 // Faça o que for necessário com os dados obtidos
-                System.out.println("ID: " + id + ", Nome: " + nome +", Ativo: " + ativo);
+                System.out.println("ID: " + id + ", Nome: " + nome +", Senha: " + senha+", Ativo: " + ativo);
             }
 
         } catch (SQLException e) {
