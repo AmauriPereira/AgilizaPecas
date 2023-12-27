@@ -27,4 +27,19 @@ public class LoginBO {
         }
     }
     
+    public Usuario buscaUsuario(String usuario) throws SQLException, excecaoLogin{
+        
+        Usuario usuarioLogado = new Usuario();
+        
+        LoginDAO LoginDAO = new LoginDAO();
+        
+        usuarioLogado = LoginDAO.selectBuscaUsuario(usuario);
+        
+        if (usuarioLogado == null) {
+            throw new excecaoLogin();
+        } else {
+            return usuarioLogado;
+        }
+    }
+    
 }
