@@ -1,19 +1,27 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package br.com.minaspecas.irmaospereira.agilizapecas.apresentacao;
 
+import static br.com.minaspecas.irmaospereira.agilizapecas.apresentacao.JFrameLoginUsuario.getInstancia;
 import br.com.minaspecas.irmaospereira.agilizapecas.entidades.Usuario;
+import java.awt.Dimension;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
 
 /**
  *
  * @author AMAURI PEREIRA
  */
 public class JFrameTelaPrincipal extends javax.swing.JFrame {
+
+    // metodo abaixo instancia um Painel de Area de Trabalho(JDP1)
+    //O painel JDP1 é area onde os formularios internos vão ser instanciados
+    public static JDesktopPane getPainel() {
+        return getInstancia().jDesktopPaneTelaPrincipal; 
+    }    
     
+
     //Variavel que recebe os dados do usuario que logou no sistema 
-    private static Usuario usuarioLogado;
+    private static Usuario usuarioLogado; 
     
     /**
      * Creates new form JFrameTelaPrincipal
@@ -22,13 +30,32 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
         initComponents();
         this.usuarioLogado = userLogado;
         this.setExtendedState(MAXIMIZED_BOTH);
-        this.configBarraStatus();
+        this.configBarraStatus();  
+                
     }
     
     private void configBarraStatus() {
 
         this.jLabelUsuarioLogado.setText(usuarioLogado.getUsuario());
 
+    }
+    
+    public  void getInstanciaCadastroUsuario () {
+        
+        JInternalFrameCadastroUsuario casdastroUsuario = new JInternalFrameCadastroUsuario();
+        casdastroUsuario.setVisible(true);
+        centralizaForm(casdastroUsuario);
+        casdastroUsuario.toFront();
+        jDesktopPaneTelaPrincipal.add(casdastroUsuario);
+        
+    }
+    
+     private void centralizaForm(JInternalFrame frame) {
+
+        Dimension desktopSize = jDesktopPaneTelaPrincipal.getSize();
+        Dimension jInternalFrameSize = frame.getSize();
+
+        frame.setLocation((desktopSize.width - jInternalFrameSize.width) / 2, (desktopSize.height - jInternalFrameSize.height) / 2);
     }
 
     /**
@@ -40,15 +67,15 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabelUsuario = new javax.swing.JLabel();
         jLabelUsuarioLogado = new javax.swing.JLabel();
         jLabelUsuarioLogado1 = new javax.swing.JLabel();
         jLabelUsuario1 = new javax.swing.JLabel();
+        jDesktopPaneTelaPrincipal = new javax.swing.JDesktopPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenuCadastros = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItemUsuario = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -82,19 +109,6 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
         setTitle("Agiliza Peças - Gerencimento de Requisição");
         setPreferredSize(new java.awt.Dimension(1980, 780));
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(1980, 1080));
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1980, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1007, Short.MAX_VALUE)
-        );
-
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabelUsuario.setText("Usuário:");
@@ -114,7 +128,7 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
                 .addComponent(jLabelUsuario1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabelUsuarioLogado1, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(1461, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -130,12 +144,28 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        javax.swing.GroupLayout jDesktopPaneTelaPrincipalLayout = new javax.swing.GroupLayout(jDesktopPaneTelaPrincipal);
+        jDesktopPaneTelaPrincipal.setLayout(jDesktopPaneTelaPrincipalLayout);
+        jDesktopPaneTelaPrincipalLayout.setHorizontalGroup(
+            jDesktopPaneTelaPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jDesktopPaneTelaPrincipalLayout.setVerticalGroup(
+            jDesktopPaneTelaPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1007, Short.MAX_VALUE)
+        );
+
         jMenuBar1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jMenuCadastros.setText("Cadastros");
 
-        jMenuItem1.setText("jMenuItem1");
-        jMenuCadastros.add(jMenuItem1);
+        jMenuItemUsuario.setText("Usuário");
+        jMenuItemUsuario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemUsuarioActionPerformed(evt);
+            }
+        });
+        jMenuCadastros.add(jMenuItemUsuario);
 
         jMenuItem2.setText("jMenuItem1");
         jMenuCadastros.add(jMenuItem2);
@@ -233,19 +263,23 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jDesktopPaneTelaPrincipal)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1007, Short.MAX_VALUE)
+                .addComponent(jDesktopPaneTelaPrincipal)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenuItemUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemUsuarioActionPerformed
+        getInstanciaCadastroUsuario(); 
+    }//GEN-LAST:event_jMenuItemUsuarioActionPerformed
 
     /**
      * @param args the command line arguments
@@ -283,6 +317,7 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JDesktopPane jDesktopPaneTelaPrincipal;
     private javax.swing.JLabel jLabelUsuario;
     private javax.swing.JLabel jLabelUsuario1;
     private javax.swing.JLabel jLabelUsuarioLogado;
@@ -290,7 +325,6 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenu jMenuCadastros;
     private javax.swing.JMenu jMenuConsultas;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
@@ -315,10 +349,10 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
+    private javax.swing.JMenuItem jMenuItemUsuario;
     private javax.swing.JMenu jMenuMovimentos;
     private javax.swing.JMenu jMenuParametros;
     private javax.swing.JMenu jMenuRelatorios;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables
 }
