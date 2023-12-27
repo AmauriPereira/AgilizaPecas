@@ -7,4 +7,5 @@ package br.com.minaspecas.irmaospereira.agilizapecas.dados;
  */
 public class UsuarioDAO {
     
+    
 }
