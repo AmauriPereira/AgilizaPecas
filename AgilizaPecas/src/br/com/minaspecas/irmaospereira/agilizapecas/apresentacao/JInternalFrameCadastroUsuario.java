@@ -2,9 +2,10 @@
 package br.com.minaspecas.irmaospereira.agilizapecas.apresentacao;
 
 
+import br.com.minaspecas.irmaospereira.agilizapecas.apresentacao.utilitarios.CriptografiaUtil;
 import br.com.minaspecas.irmaospereira.agilizapecas.entidades.Usuario;
-import br.com.minaspecas.irmaospereira.agilizapecas.negocios.LoginBO;
 import br.com.minaspecas.irmaospereira.agilizapecas.excessoes.excecaoLogin;
+import br.com.minaspecas.irmaospereira.agilizapecas.negocios.UsuarioBO;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
@@ -13,17 +14,28 @@ import javax.swing.JOptionPane;
  * @author AMAURI PEREIRA
  */
 public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
-    
+    /**
+     * Variavel para contrar se irar excluir, alterar, incluir ou procurar um novo registro.
+     * 1 - incluir
+     * 2 - alterar
+     * 3 - excluir
+     * 4 - pesquisar
+     * 
+     */
+    private static Integer acao;
     
     /**
      * Creates new form JInternalFrameCadastroUsuario
      */
     public JInternalFrameCadastroUsuario() {
         initComponents();
-        this.jTextFieldUsuario.setEnabled(true);
-        this.jTextFieldSenha.setEnabled(false);
-        this.jTextFieldConfirmaSenha.setEnabled(false);
-        this.jCheckBoxAtivo.setEnabled(false);
+        
+        this.jTextFieldCodigo.enable(false);
+        this.jTextFieldUsuario.enable(false);
+        this.jPasswordField.enable(false);
+        this.jPasswordConfirmacao.enable(false);
+        this.jCheckBoxAtivo.enable(false);
+        this.jCheckBoxGerente.enable(false);
     }
     
     public static void main(String args[]) {
@@ -57,40 +69,157 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
             }
         });
     }
-    
-    public void buscaUsuario() {
+    public void persisteUsuario() {  
         
+        Usuario usuarioAux = new Usuario();
         
         //cria duas variaveis para receber os dados da tela de  "login do usuario"
-        String usuario = jTextFieldUsuario.getText();
-        Usuario userLogado;
+        String idUsuario = jTextFieldCodigo.getText();
+        String usuario = jTextFieldUsuario.getText().toUpperCase();
+        String senha = jPasswordField.getText();
+        String confirmaSenha = jPasswordConfirmacao.getText();
+        String gerente =  (jCheckBoxGerente.isSelected())? "S" : "N";  
+        String ativo = (jCheckBoxAtivo.isSelected()) ? "S" : "N";
+                        
+        switch (acao) {
+            case 1: 
+                
+                if (senha.equals(confirmaSenha)){  
+                    CriptografiaUtil criptografiaUtil = new CriptografiaUtil();
+                    usuarioAux.setSenha(criptografiaUtil.criptografiaSenha(senha));
+                    usuarioAux.setUsuario(usuario);
+                    usuarioAux.setAtivo(ativo);
+                    usuarioAux.setGerente(gerente);
+                    
+                    incluirUsuario(usuarioAux);
+                    usuarioAux = null;
+
+                }else{
+                    JOptionPane.showMessageDialog(null, "Senha e confirmação não coincidem. Por favor, verifique.",
+                            "Verificação de Senha", JOptionPane.ERROR_MESSAGE);
+                }
+                
+                break;
+            case 2:
+                
+                if (senha.equals(confirmaSenha)){  
+
+                    CriptografiaUtil criptografiaUtil = new CriptografiaUtil();
+                    
+                    if (!"".equals(jPasswordField.getText())||!"".equals(jPasswordConfirmacao.getText())) {
+                         usuarioAux.setSenha(criptografiaUtil.criptografiaSenha(senha));
+                    }
+               
+                    usuarioAux.setIdUsuario(Integer.parseInt(idUsuario));
+                    usuarioAux.setUsuario(usuario);
+                    usuarioAux.setAtivo(ativo);
+                    usuarioAux.setGerente(gerente);
+                    
+                    alterarUsuario(usuarioAux);
+                    usuarioAux = null;
+
+                }else{
+                    JOptionPane.showMessageDialog(null, "Senha e confirmação não coincidem. Por favor, verifique.",
+                            "Verificação de Senha", JOptionPane.ERROR_MESSAGE);
+                }
+                
+                break;
+            case 3:
+                break;
+
+            case 4:
+                pesquisarUsuario(usuario);
+                break;
+            default:
+        }
         
-                         
-        LoginBO logarBO = new LoginBO();
+        
+    }
+    
+    private void pesquisarUsuario(String usuario) {        
+        
+        //cria duas variaveis para receber os dados da tela de  "login do usuario"
+        Usuario user;
+        UsuarioBO usuarioBO = new UsuarioBO();
         
         try {
-            userLogado = logarBO.buscaUsuario(usuario);
-            String ativo = userLogado.getAtivo();
+            user = usuarioBO.pesquisarUsuario(usuario);
             
-            jTextFieldUsuario.setText(userLogado.getUsuario());
-            jTextFieldSenha.setText(userLogado.getSenha());
-                         
-            if (ativo.toString() == "S") {
-                jCheckBoxAtivo.setSelected(true);
+            jTextFieldUsuario.setText(user.getUsuario());  
+            jTextFieldCodigo.setText(Integer.toString(user.getIdUsuario())); 
+            if ("S".equals(user.getAtivo())) jCheckBoxAtivo.setSelected(true);
+            if ("S".equals(user.getGerente())) jCheckBoxGerente.setSelected(true);
                 
-            }else{
-                //jCheckBoxAtivo.setSelected(false);
-            }
                         
         } catch (SQLException ex) {
-            System.out.println(ex);
             JOptionPane.showMessageDialog(null, "Erro não foi possivel buscar o registro"+ex,
                     "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (excecaoLogin ex) {
             JOptionPane.showMessageDialog(null, "Usuario não encontrado!", "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    
+    private void incluirUsuario(Usuario usuario) {        
+        
+        UsuarioBO usuarioBO = new UsuarioBO();
+        
+        try {
+            usuarioBO.incluirUsuario(usuario);
+            
+            JOptionPane.showMessageDialog(null, "Usuario cadastrado com sucesso!",
+                                    "Cadastro de Usuário", JOptionPane.INFORMATION_MESSAGE);
+            
+            restauraEstadoPadrao();
+                
+                        
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro não foi possivel buscar o registro"+ex,
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (excecaoLogin ex) {
+            JOptionPane.showMessageDialog(null, "Usuario não encontrado!", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    
+    private void alterarUsuario(Usuario usuario) {        
+        
+        UsuarioBO usuarioBO = new UsuarioBO();
+        
+        try {
+            usuarioBO.alterarUsuario(usuario);
+            
+            JOptionPane.showMessageDialog(null, "Usuario alterado com sucesso!",
+                                    "Alteração de Usuário", JOptionPane.INFORMATION_MESSAGE);
+            
+            restauraEstadoPadrao();
+                
+                        
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro não foi possivel alterar o registro"+ex,
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (excecaoLogin ex) {
+            JOptionPane.showMessageDialog(null, "Usuario não encontrado!", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void restauraEstadoPadrao(){
+        this.jTextFieldCodigo.setText("");
+        this.jTextFieldUsuario.setText("");
+        this.jPasswordField.setText("");
+        this.jPasswordConfirmacao.setText("");
+        this.jCheckBoxAtivo.setSelected(false);
+        this.jCheckBoxGerente.setSelected(false);
+        
+        this.jTextFieldUsuario.setEnabled(false);
+        this.jPasswordField.setEnabled(false);
+        this.jPasswordConfirmacao.setEnabled(false);
+        this.jCheckBoxAtivo.setEnabled(false);
+        this.jCheckBoxGerente.setEnabled(false);
+        
+        this.jButtonExcluir.setEnabled(true);
+        this.jButtonAlterar.setEnabled(true);
+        this.jButtonIncluir.setEnabled(true); 
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -104,15 +233,21 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
         jLabel1 = new javax.swing.JLabel();
         jTextFieldUsuario = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        jTextFieldSenha = new javax.swing.JTextField();
-        jTextFieldConfirmaSenha = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jButtonOk = new javax.swing.JButton();
-        jButtonCancelar = new javax.swing.JButton();
-        jButtonAlterar = new javax.swing.JButton();
-        jButtonNovo = new javax.swing.JButton();
         jCheckBoxAtivo = new javax.swing.JCheckBox();
-        jButtonBuscar = new javax.swing.JButton();
+        jCheckBoxGerente = new javax.swing.JCheckBox();
+        jLabel4 = new javax.swing.JLabel();
+        jTextFieldCodigo = new javax.swing.JTextField();
+        jPasswordField = new javax.swing.JPasswordField();
+        jPasswordConfirmacao = new javax.swing.JPasswordField();
+        jPanel2 = new javax.swing.JPanel();
+        jButtonLimpar = new javax.swing.JButton();
+        jButtonCancelar = new javax.swing.JButton();
+        jButtonOk = new javax.swing.JButton();
+        jButtonIncluir = new javax.swing.JButton();
+        jButtonPesquisar = new javax.swing.JButton();
+        jButtonExcluir = new javax.swing.JButton();
+        jButtonAlterar = new javax.swing.JButton();
 
         setClosable(true);
         setIconifiable(true);
@@ -120,7 +255,7 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
         setResizable(true);
         setTitle("Cadastro de Usuário");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel1.setText("Usuário");
 
@@ -128,27 +263,11 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
 
         jLabel3.setText("Confirme a Senha");
 
-        jButtonOk.setText("OK");
-
-        jButtonCancelar.setText("Cancelar");
-
-        jButtonAlterar.setText("Alterar");
-
-        jButtonNovo.setText("Novo");
-        jButtonNovo.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButtonNovoMouseClicked(evt);
-            }
-        });
-
         jCheckBoxAtivo.setText("Ativo");
 
-        jButtonBuscar.setText("Buscar");
-        jButtonBuscar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButtonBuscarMouseClicked(evt);
-            }
-        });
+        jCheckBoxGerente.setText("Gerente");
+
+        jLabel4.setText("Código");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -158,103 +277,250 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jTextFieldUsuario)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jCheckBoxGerente)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBoxAtivo))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jTextFieldCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jTextFieldSenha, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPasswordField, javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel1)
                                     .addComponent(jLabel2))
                                 .addGap(0, 0, Short.MAX_VALUE)))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextFieldConfirmaSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBoxAtivo, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jButtonBuscar)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButtonAlterar)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButtonCancelar)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButtonNovo)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButtonOk)))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addGap(89, 89, 89))
+                            .addComponent(jPasswordConfirmacao))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jCheckBoxAtivo)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jCheckBoxAtivo)
+                    .addComponent(jCheckBoxGerente))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextFieldCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTextFieldUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextFieldSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextFieldConfirmaSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonOk)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPasswordConfirmacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel2))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jButtonLimpar.setText("Limpar");
+        jButtonLimpar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonLimparActionPerformed(evt);
+            }
+        });
+
+        jButtonCancelar.setText("Cancelar");
+        jButtonCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCancelarActionPerformed(evt);
+            }
+        });
+
+        jButtonOk.setText("OK");
+        jButtonOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonOkActionPerformed(evt);
+            }
+        });
+
+        jButtonIncluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/minaspecas/irmaospereira/agilizapecas/icones/incluir.png"))); // NOI18N
+        jButtonIncluir.setToolTipText("Incluir");
+        jButtonIncluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonIncluirActionPerformed(evt);
+            }
+        });
+
+        jButtonPesquisar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/minaspecas/irmaospereira/agilizapecas/icones/pesquisar.png"))); // NOI18N
+        jButtonPesquisar.setToolTipText("Pesquisar");
+        jButtonPesquisar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonPesquisarActionPerformed(evt);
+            }
+        });
+
+        jButtonExcluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/minaspecas/irmaospereira/agilizapecas/icones/excluir.png"))); // NOI18N
+        jButtonExcluir.setToolTipText("Excluir");
+        jButtonExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonExcluirActionPerformed(evt);
+            }
+        });
+
+        jButtonAlterar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/minaspecas/irmaospereira/agilizapecas/icones/alterar.png"))); // NOI18N
+        jButtonAlterar.setToolTipText("Alterar");
+        jButtonAlterar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonAlterarActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButtonIncluir)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonAlterar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonExcluir)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButtonPesquisar)
+                .addGap(30, 30, 30)
+                .addComponent(jButtonLimpar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonCancelar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonOk, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButtonAlterar)
-                    .addComponent(jButtonCancelar)
-                    .addComponent(jButtonBuscar)
-                    .addComponent(jButtonNovo))
-                .addGap(14, 14, 14))
+                    .addComponent(jButtonExcluir)
+                    .addComponent(jButtonPesquisar)
+                    .addComponent(jButtonIncluir)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jButtonOk)
+                        .addComponent(jButtonLimpar)
+                        .addComponent(jButtonCancelar)))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButtonNovoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonNovoMouseClicked
-        this.jTextFieldUsuario.setEnabled(true);
-        this.jTextFieldSenha.setEnabled(true);
-        this.jTextFieldConfirmaSenha.setEnabled(true);
-        this.jCheckBoxAtivo.setEnabled(true);
-    }//GEN-LAST:event_jButtonNovoMouseClicked
+    private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
+        persisteUsuario();
+    }//GEN-LAST:event_jButtonOkActionPerformed
 
-    private void jButtonBuscarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonBuscarMouseClicked
-        buscaUsuario();
-    }//GEN-LAST:event_jButtonBuscarMouseClicked
+    private void jButtonCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelarActionPerformed
+        restauraEstadoPadrao();
+    }//GEN-LAST:event_jButtonCancelarActionPerformed
+
+    private void jButtonLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLimparActionPerformed
+        this.jTextFieldCodigo.setText("");
+        this.jTextFieldUsuario.setText("");
+        this.jPasswordField.setText("");
+        this.jPasswordConfirmacao.setText("");
+        this.jCheckBoxAtivo.setSelected(false);
+        this.jCheckBoxGerente.setSelected(false);
+    }//GEN-LAST:event_jButtonLimparActionPerformed
+
+    private void jButtonIncluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonIncluirActionPerformed
+        this.jButtonExcluir.setEnabled(false);
+        this.jButtonAlterar.setEnabled(false);
+        this.jButtonPesquisar.setEnabled(false);
+        this.jButtonIncluir.setEnabled(true);
+        
+        this.jTextFieldUsuario.setEnabled(true);
+        this.jPasswordField.setEnabled(true);
+        this.jPasswordConfirmacao.setEnabled(true);
+        this.jCheckBoxAtivo.setEnabled(true);
+        this.jCheckBoxGerente.setEnabled(true);
+        
+        acao = 1;
+    }//GEN-LAST:event_jButtonIncluirActionPerformed
+
+    private void jButtonExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExcluirActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonExcluirActionPerformed
+
+    private void jButtonAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAlterarActionPerformed
+        this.jTextFieldUsuario.setEnabled(true);     
+        this.jPasswordField.setEnabled(true);
+        this.jPasswordConfirmacao.setEnabled(true);
+        this.jCheckBoxAtivo.setEnabled(true);
+        this.jCheckBoxGerente.setEnabled(true);
+        
+        this.jButtonExcluir.setEnabled(false);
+        this.jButtonAlterar.setEnabled(true);
+        this.jButtonIncluir.setEnabled(false);
+        
+        acao = 2;
+    }//GEN-LAST:event_jButtonAlterarActionPerformed
+
+    private void jButtonPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPesquisarActionPerformed
+        this.jTextFieldUsuario.setEnabled(true);        
+        this.jButtonExcluir.setEnabled(false);
+        this.jButtonAlterar.setEnabled(true);
+        this.jButtonIncluir.setEnabled(false);
+        acao = 4;
+    }//GEN-LAST:event_jButtonPesquisarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAlterar;
-    private javax.swing.JButton jButtonBuscar;
     private javax.swing.JButton jButtonCancelar;
-    private javax.swing.JButton jButtonNovo;
+    private javax.swing.JButton jButtonExcluir;
+    private javax.swing.JButton jButtonIncluir;
+    private javax.swing.JButton jButtonLimpar;
     private javax.swing.JButton jButtonOk;
+    private javax.swing.JButton jButtonPesquisar;
     private javax.swing.JCheckBox jCheckBoxAtivo;
+    private javax.swing.JCheckBox jCheckBoxGerente;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JTextField jTextFieldConfirmaSenha;
-    private javax.swing.JTextField jTextFieldSenha;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPasswordField jPasswordConfirmacao;
+    private javax.swing.JPasswordField jPasswordField;
+    private javax.swing.JTextField jTextFieldCodigo;
     private javax.swing.JTextField jTextFieldUsuario;
     // End of variables declaration//GEN-END:variables
 }
