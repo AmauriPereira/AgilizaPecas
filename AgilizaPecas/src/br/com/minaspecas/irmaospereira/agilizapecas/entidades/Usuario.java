@@ -9,6 +9,7 @@ public class Usuario {
     private int idUsuario;
     private String usuario;
     private String senha;
+    private String gerente;
     private String ativo;
 
     public int getIdUsuario() {
@@ -35,6 +36,14 @@ public class Usuario {
         this.senha = senha;
     }
 
+    public String getGerente() {
+        return gerente;
+    }
+
+    public void setGerente(String gerente) {
+        this.gerente = gerente;
+    }
+    
     public String getAtivo() {
         return ativo;
     }
