@@ -35,9 +35,7 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
     }
     
     private void configBarraStatus() {
-
         this.jLabelUsuarioLogado.setText(usuarioLogado.getUsuario());
-
     }
     
     public  void getInstanciaCadastroUsuario () {
@@ -54,8 +52,8 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
 
         Dimension desktopSize = jDesktopPaneTelaPrincipal.getSize();
         Dimension jInternalFrameSize = frame.getSize();
-
         frame.setLocation((desktopSize.width - jInternalFrameSize.width) / 2, (desktopSize.height - jInternalFrameSize.height) / 2);
+        
     }
 
     /**
