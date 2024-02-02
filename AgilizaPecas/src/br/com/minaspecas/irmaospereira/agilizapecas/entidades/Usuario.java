@@ -2,7 +2,7 @@
 package br.com.minaspecas.irmaospereira.agilizapecas.entidades;
 
 /**
- *
+ * Class Usuario
  * @author Amauri Pereira
  */
 public class Usuario {
