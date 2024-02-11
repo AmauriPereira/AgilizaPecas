@@ -3,6 +3,7 @@ package br.com.minaspecas.irmaospereira.agilizapecas.dados;
 
 
 import br.com.minaspecas.irmaospereira.agilizapecas.entidades.Usuario;
+import br.com.minaspecas.irmaospereira.agilizapecas.excessoes.excecaoDeletarElemento;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,6 +20,7 @@ public class UsuarioDAO {
     private static final String SQL_UPDATE_USUARIO_COMPLETO = "UPDATE ACESSO SET USUARIO = ?, SENHA = ?, ATIVO = ?, GERENTE = ? WHERE ID_USUARIO = ?";
     private static final String SQL_UPDATE_USUARIO_PARCIAL = "UPDATE ACESSO SET USUARIO = ?, ATIVO = ?, GERENTE = ? WHERE ID_USUARIO = ?";
     private static final String SQL_GET_GENERATOR_ID_USUARIO = "SELECT GEN_ID(GEN_ACESSO_ID, 1) FROM RDB$DATABASE";
+    private static final String SQL_DELETE_USUARIO = "DELETE FROM ACESSO WHERE ID_USUARIO = ?";
     
     public Usuario pesquisaUsuario (String usuario) throws SQLException{
         
@@ -55,6 +57,7 @@ public class UsuarioDAO {
             if (conexao != null) {
                 conexao.rollback();
             }
+            throw new RuntimeException(e);
         } finally {
             if (comando != null && !comando.isClosed()) {
                 comando.close();
@@ -65,7 +68,7 @@ public class UsuarioDAO {
         }
         return user;
     }
-    
+        
     public void incluiUsuario (Usuario user) throws SQLException {
         
         Connection conexao = null;
@@ -148,6 +151,37 @@ public class UsuarioDAO {
             }
         }
     }
+    
+    public void deleteUsuario(Usuario user) throws SQLException, excecaoDeletarElemento {
+        Connection conexao = null;
+        PreparedStatement comando = null;
+
+        try {
+
+            conexao = BancoDadosUtil.getConnection();
+            conexao.setAutoCommit(false);
+            
+            comando = conexao.prepareStatement(SQL_DELETE_USUARIO);
+            comando.setInt(1, user.getIdUsuario());
+
+            comando.execute();
+            conexao.setAutoCommit(true);
+
+        } catch (Exception e) {
+            if (conexao != null) {
+                conexao.rollback();
+            }
+            throw new excecaoDeletarElemento();
+
+        } finally {
+            if (comando != null && !comando.isClosed()) {
+                comando.close();
+            }
+            if (conexao != null && !conexao.isClosed()) {
+                conexao.close();
+            }
+        }
+    }    
         
     private int getGeneratorIdUsuario () throws SQLException{
         
@@ -158,10 +192,8 @@ public class UsuarioDAO {
                 
         try {
             
-            conexao = BancoDadosUtil.getConnection();
-            
+            conexao = BancoDadosUtil.getConnection();            
             conexao.setAutoCommit(false);
-
             comando = conexao.prepareStatement(SQL_GET_GENERATOR_ID_USUARIO);
 
             resultado = comando.executeQuery();

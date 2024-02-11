@@ -48,6 +48,16 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
         
     }
     
+    public void getInstanciaCadastroMarca () {
+        
+        JInternalFrameCadastroMarca casdastroMarca = new JInternalFrameCadastroMarca();
+        casdastroMarca.setVisible(true);
+        centralizaForm(casdastroMarca);
+        casdastroMarca.toFront();
+        jDesktopPaneTelaPrincipal.add(casdastroMarca);
+        
+    }
+    
      private void centralizaForm(JInternalFrame frame) {
 
         Dimension desktopSize = jDesktopPaneTelaPrincipal.getSize();
@@ -74,7 +84,7 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenuCadastros = new javax.swing.JMenu();
         jMenuItemUsuario = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItemMarca = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
@@ -165,8 +175,13 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
         });
         jMenuCadastros.add(jMenuItemUsuario);
 
-        jMenuItem2.setText("jMenuItem1");
-        jMenuCadastros.add(jMenuItem2);
+        jMenuItemMarca.setText("Marca");
+        jMenuItemMarca.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemMarcaActionPerformed(evt);
+            }
+        });
+        jMenuCadastros.add(jMenuItemMarca);
 
         jMenuItem3.setText("jMenuItem1");
         jMenuCadastros.add(jMenuItem3);
@@ -279,6 +294,10 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
         getInstanciaCadastroUsuario(); 
     }//GEN-LAST:event_jMenuItemUsuarioActionPerformed
 
+    private void jMenuItemMarcaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMarcaActionPerformed
+        getInstanciaCadastroMarca();
+    }//GEN-LAST:event_jMenuItemMarcaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -333,7 +352,6 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem17;
     private javax.swing.JMenuItem jMenuItem18;
     private javax.swing.JMenuItem jMenuItem19;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem20;
     private javax.swing.JMenuItem jMenuItem21;
     private javax.swing.JMenuItem jMenuItem22;
@@ -347,6 +365,7 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
+    private javax.swing.JMenuItem jMenuItemMarca;
     private javax.swing.JMenuItem jMenuItemUsuario;
     private javax.swing.JMenu jMenuMovimentos;
     private javax.swing.JMenu jMenuParametros;

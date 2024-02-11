@@ -123,6 +123,11 @@ public class JFrameLoginUsuario extends javax.swing.JFrame {
         });
 
         jButtonOk.setText("Ok");
+        jButtonOk.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButtonOkMouseClicked(evt);
+            }
+        });
         jButtonOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonOkActionPerformed(evt);
@@ -194,6 +199,10 @@ public class JFrameLoginUsuario extends javax.swing.JFrame {
     private void jButtonCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelarActionPerformed
         this.dispose();
     }//GEN-LAST:event_jButtonCancelarActionPerformed
+
+    private void jButtonOkMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonOkMouseClicked
+    
+    }//GEN-LAST:event_jButtonOkMouseClicked
 
     /**
      * @param args the command line arguments

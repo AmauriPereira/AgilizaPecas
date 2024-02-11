@@ -1,12 +1,16 @@
 
 package br.com.minaspecas.irmaospereira.agilizapecas.apresentacao;
 
-
 import br.com.minaspecas.irmaospereira.agilizapecas.apresentacao.utilitarios.CriptografiaUtil;
 import br.com.minaspecas.irmaospereira.agilizapecas.entidades.Usuario;
+import br.com.minaspecas.irmaospereira.agilizapecas.excessoes.excecaoDeletarElemento;
 import br.com.minaspecas.irmaospereira.agilizapecas.excessoes.excecaoLogin;
+import br.com.minaspecas.irmaospereira.agilizapecas.excessoes.excecaoUsuarioCadastrado;
+import br.com.minaspecas.irmaospereira.agilizapecas.excessoes.excessaoUsuarioNaoEncontrado;
 import br.com.minaspecas.irmaospereira.agilizapecas.negocios.UsuarioBO;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -22,7 +26,7 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
      * 4 - pesquisar
      * 
      */
-    private static Integer acao;
+    private static Integer acaoBotao;
     
     /**
      * Creates new form JInternalFrameCadastroUsuario
@@ -36,6 +40,10 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
         this.jPasswordConfirmacao.enable(false);
         this.jCheckBoxAtivo.enable(false);
         this.jCheckBoxGerente.enable(false);
+        
+        this.jButtonExcluir.setEnabled(false);
+        this.jButtonAlterar.setEnabled(false);
+        this.jButtonIncluir.setEnabled(true); 
     }
     
     public static void main(String args[]) {
@@ -69,7 +77,7 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
             }
         });
     }
-    public void persisteUsuario() {  
+    public void persisteUsuario() throws excecaoDeletarElemento, excecaoLogin, excessaoUsuarioNaoEncontrado {  
         
         Usuario usuarioAux = new Usuario();
         
@@ -81,7 +89,7 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
         String gerente =  (jCheckBoxGerente.isSelected())? "S" : "N";  
         String ativo = (jCheckBoxAtivo.isSelected()) ? "S" : "N";
                         
-        switch (acao) {
+        switch (acaoBotao) {
             case 1: 
                 
                 if (senha.equals(confirmaSenha)){  
@@ -125,10 +133,24 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
                 
                 break;
             case 3:
+                
+                int returnInput = JOptionPane.showConfirmDialog(null, 
+                "Deseja excluir o registro?", "Selecione a opção...",JOptionPane.YES_NO_OPTION);
+                
+                if (returnInput == 0){
+                    usuarioAux.setIdUsuario(Integer.parseInt(idUsuario));
+                    excluirUsuario(usuarioAux);
+                    usuarioAux = null;
+                    
+                }                 
                 break;
-
             case 4:
+                                
                 pesquisarUsuario(usuario);
+                this.jButtonExcluir.setEnabled(true);
+                this.jButtonAlterar.setEnabled(true);
+                this.jButtonIncluir.setEnabled(false);
+                
                 break;
             default:
         }
@@ -136,7 +158,7 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
         
     }
     
-    private void pesquisarUsuario(String usuario) {        
+    private void pesquisarUsuario(String usuario) throws excessaoUsuarioNaoEncontrado, excecaoLogin {        
         
         //cria duas variaveis para receber os dados da tela de  "login do usuario"
         Usuario user;
@@ -154,12 +176,12 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Erro não foi possivel buscar o registro"+ex,
                     "Erro", JOptionPane.ERROR_MESSAGE);
-        } catch (excecaoLogin ex) {
+        } catch (excessaoUsuarioNaoEncontrado ex) {
             JOptionPane.showMessageDialog(null, "Usuario não encontrado!", "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
     
-    private void incluirUsuario(Usuario usuario) {        
+    private void incluirUsuario(Usuario usuario) throws excecaoLogin, excessaoUsuarioNaoEncontrado {        
         
         UsuarioBO usuarioBO = new UsuarioBO();
         
@@ -168,6 +190,29 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
             
             JOptionPane.showMessageDialog(null, "Usuario cadastrado com sucesso!",
                                     "Cadastro de Usuário", JOptionPane.INFORMATION_MESSAGE);
+            
+            restauraEstadoPadrao();
+                
+                        
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro não foi possivel buscar o registro"+ex,
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (excecaoUsuarioCadastrado ex) {
+            JOptionPane.showMessageDialog(null, "Usuário ja está cadastrado", "Erro", JOptionPane.ERROR_MESSAGE);
+        }  catch (RuntimeException ex) {
+            JOptionPane.showMessageDialog(null, "Usuário ja está cadastrado"+ex, "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+     private void excluirUsuario(Usuario usuario) throws excecaoDeletarElemento {        
+        
+        UsuarioBO usuarioBO = new UsuarioBO();
+        
+        try {
+            usuarioBO.excluirUsuario(usuario);
+            
+            JOptionPane.showMessageDialog(null, "Usuario excluído com sucesso!",
+                                    "Exclusão de Usuário", JOptionPane.INFORMATION_MESSAGE);
             
             restauraEstadoPadrao();
                 
@@ -191,8 +236,7 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "Usuario alterado com sucesso!",
                                     "Alteração de Usuário", JOptionPane.INFORMATION_MESSAGE);
             
-            restauraEstadoPadrao();
-                
+            restauraEstadoPadrao();                
                         
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Erro não foi possivel alterar o registro"+ex,
@@ -444,7 +488,15 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
-        persisteUsuario();
+        try {
+            persisteUsuario();
+        } catch (excecaoDeletarElemento ex) {
+            Logger.getLogger(JInternalFrameCadastroUsuario.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (excecaoLogin ex) {
+            Logger.getLogger(JInternalFrameCadastroUsuario.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (excessaoUsuarioNaoEncontrado ex) {
+            Logger.getLogger(JInternalFrameCadastroUsuario.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButtonOkActionPerformed
 
     private void jButtonCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelarActionPerformed
@@ -472,11 +524,11 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
         this.jCheckBoxAtivo.setEnabled(true);
         this.jCheckBoxGerente.setEnabled(true);
         
-        acao = 1;
+        acaoBotao = 1;
     }//GEN-LAST:event_jButtonIncluirActionPerformed
 
     private void jButtonExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExcluirActionPerformed
-        // TODO add your handling code here:
+        acaoBotao = 3;
     }//GEN-LAST:event_jButtonExcluirActionPerformed
 
     private void jButtonAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAlterarActionPerformed
@@ -490,15 +542,15 @@ public class JInternalFrameCadastroUsuario extends javax.swing.JInternalFrame {
         this.jButtonAlterar.setEnabled(true);
         this.jButtonIncluir.setEnabled(false);
         
-        acao = 2;
+        acaoBotao = 2;
     }//GEN-LAST:event_jButtonAlterarActionPerformed
 
     private void jButtonPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPesquisarActionPerformed
         this.jTextFieldUsuario.setEnabled(true);        
         this.jButtonExcluir.setEnabled(false);
-        this.jButtonAlterar.setEnabled(true);
+        this.jButtonAlterar.setEnabled(false);
         this.jButtonIncluir.setEnabled(false);
-        acao = 4;
+        acaoBotao = 4;
     }//GEN-LAST:event_jButtonPesquisarActionPerformed
 
 
