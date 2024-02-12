@@ -9,17 +9,10 @@ public class BancoDadosUtil {
     private static final String URL = "jdbc:firebirdsql://localhost/" + System.getProperty("user.dir") + "\\database\\AGILIZA.FDB";
     private static final String USUARIO = "SYSDBA";
     private static final String SENHA = "masterkey";
-    
-     
-    
-    
-
 
     public static Connection getConnection() {
         // Configurações para a conexão com o banco de dados Firebird        
         Connection connection = null;
-        
-        
 
         try {
 
