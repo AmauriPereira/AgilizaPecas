@@ -15,13 +15,13 @@ import java.sql.SQLException;
  */
 public class UsuarioBO {
     
-    public Usuario pesquisarUsuario (String usuario) throws SQLException, excessaoUsuarioNaoEncontrado{
+    public Usuario pesquisarUsuario (String usuario,String codigo) throws SQLException, excessaoUsuarioNaoEncontrado{
         
         Usuario user = new Usuario();
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         
-        user = usuarioDAO.pesquisaUsuario(usuario);
+        user = usuarioDAO.pesquisaUsuario(usuario, codigo);
         
         if (user == null) {
             throw new excessaoUsuarioNaoEncontrado();
@@ -35,7 +35,7 @@ public class UsuarioBO {
         Usuario user = new Usuario();
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         
-        user = usuarioDAO.pesquisaUsuario(usuario.getUsuario());
+        user = usuarioDAO.pesquisaUsuario(usuario.getUsuario(),null);
         
         if (user == null) {
             usuarioDAO.incluiUsuario(usuario);

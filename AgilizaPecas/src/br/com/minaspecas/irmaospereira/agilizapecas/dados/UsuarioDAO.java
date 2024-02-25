@@ -15,14 +15,15 @@ import javax.swing.JOptionPane;
  * @author AMAURI PEREIRA
  */
 public class UsuarioDAO {
-    private static final String SQL_SELECT_USUARIO = "SELECT * FROM ACESSO WHERE USUARIO LIKE ?";
+    private static final String SQL_SELECT_USUARIO_NOME = "SELECT * FROM ACESSO WHERE USUARIO LIKE ?";
+    private static final String SQL_SELECT_USUARIO_CODIGO = "SELECT * FROM ACESSO WHERE ID_USUARIO = ?";
     private static final String SQL_INSERT_NOVO_USUARIO = "INSERT INTO ACESSO ( ID_USUARIO, USUARIO, SENHA, ATIVO, GERENTE) VALUES (?,?,?,?,?)";
     private static final String SQL_UPDATE_USUARIO_COMPLETO = "UPDATE ACESSO SET USUARIO = ?, SENHA = ?, ATIVO = ?, GERENTE = ? WHERE ID_USUARIO = ?";
     private static final String SQL_UPDATE_USUARIO_PARCIAL = "UPDATE ACESSO SET USUARIO = ?, ATIVO = ?, GERENTE = ? WHERE ID_USUARIO = ?";
     private static final String SQL_GET_GENERATOR_ID_USUARIO = "SELECT GEN_ID(GEN_ACESSO_ID, 1) FROM RDB$DATABASE";
     private static final String SQL_DELETE_USUARIO = "DELETE FROM ACESSO WHERE ID_USUARIO = ?";
     
-    public Usuario pesquisaUsuario (String usuario) throws SQLException{
+    public Usuario pesquisaUsuario (String usuario, String codigo) throws SQLException{
         
         Connection conexao = null;
         PreparedStatement comando = null;
@@ -34,9 +35,17 @@ public class UsuarioDAO {
             conexao = BancoDadosUtil.getConnection();
             
             conexao.setAutoCommit(false);
-
-            comando = conexao.prepareStatement(SQL_SELECT_USUARIO);
-            comando.setString(1, usuario);
+            
+            if (!"".equals(usuario)) {
+                comando = conexao.prepareStatement(SQL_SELECT_USUARIO_NOME);
+                comando.setString(1, usuario);
+            }else{
+                if(!"".equals(codigo)){
+                comando = conexao.prepareStatement(SQL_SELECT_USUARIO_CODIGO);
+                comando.setInt(1, Integer.parseInt(codigo));
+                }
+            }
+            
 
             resultado = comando.executeQuery();
 
