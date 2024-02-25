@@ -30,4 +30,15 @@ public class MarcaBO {
         }
     }
     
+    public void incluirMarca (Marca marca) throws SQLException{
+
+        Marca marcaAux = new Marca();
+        MarcaDAO marcaDAO = new MarcaDAO();
+
+        //marcaAux = marcaDAO.pesquisaMarca(marca.getDescricao());
+
+
+        marcaDAO.incluiMarca(marca);
+    }
+    
 }
