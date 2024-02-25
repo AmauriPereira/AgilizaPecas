@@ -2,14 +2,8 @@
 package br.com.minaspecas.irmaospereira.agilizapecas.apresentacao;
 
 import br.com.minaspecas.irmaospereira.agilizapecas.entidades.Marca;
-import br.com.minaspecas.irmaospereira.agilizapecas.entidades.Usuario;
-import br.com.minaspecas.irmaospereira.agilizapecas.excessoes.excecaoDeletarElemento;
-import br.com.minaspecas.irmaospereira.agilizapecas.excessoes.excecaoLogin;
-import br.com.minaspecas.irmaospereira.agilizapecas.excessoes.excessaoUsuarioNaoEncontrado;
 import br.com.minaspecas.irmaospereira.agilizapecas.negocios.MarcaBO;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -18,7 +12,7 @@ import javax.swing.JOptionPane;
  */
 public class JInternalFrameCadastroMarca extends javax.swing.JInternalFrame {
     /**
-     * Variavel para contrar se irar excluir, alterar, incluir ou procurar um novo registro.
+     * Variavel para controlar se irar excluir, alterar, incluir ou procurar um novo registro.
      * 1 - incluir
      * 2 - alterar
      * 3 - excluir
@@ -39,6 +33,7 @@ public class JInternalFrameCadastroMarca extends javax.swing.JInternalFrame {
         this.jButtonExcluir.setEnabled(false);
         this.jButtonAlterar.setEnabled(false);
         this.jButtonIncluir.setEnabled(true); 
+        this.jButtonPesquisar.setEnabled(true);
     }
     
     public static void main(String args[]) {
@@ -72,9 +67,9 @@ public class JInternalFrameCadastroMarca extends javax.swing.JInternalFrame {
             }
         });
     }
-    public void persisteMarca() throws excecaoDeletarElemento, excecaoLogin, excessaoUsuarioNaoEncontrado {  
+    private void persisteMarca()  {  
         
-        Usuario usuarioAux = new Usuario();
+        Marca marcaAux = new Marca();
         
         //cria duas variaveis para receber os dados da tela de  "login do marca"
         String idMarca = jTextFieldCodigo.getText();
@@ -83,6 +78,9 @@ public class JInternalFrameCadastroMarca extends javax.swing.JInternalFrame {
         switch (acaoBotao) {
             case 1: 
                 
+                marcaAux.setDescricao(marca);
+                incluirMarca(marcaAux);
+                marcaAux = null;
 
                 break;
             case 2:
@@ -93,6 +91,11 @@ public class JInternalFrameCadastroMarca extends javax.swing.JInternalFrame {
                                  
                 break;
             case 4:
+                
+                pesquisarMarca(marca);
+                this.jButtonExcluir.setEnabled(true);
+                this.jButtonAlterar.setEnabled(true);
+                this.jButtonIncluir.setEnabled(false);
                                 
                 break;
             default:
@@ -102,15 +105,16 @@ public class JInternalFrameCadastroMarca extends javax.swing.JInternalFrame {
     }
     
     private void pesquisarMarca(String marca) {      
-        //cria duas variaveis para receber os dados da tela de  "login do usuario"
+        //cria uma variaveis para receber os dados da tela de "Cadastro de Marca".
         Marca marcaAux;
+        
         MarcaBO marcaBO = new MarcaBO();
         
         try {
             marcaAux = marcaBO.pesquisarMarca(marca);
             
-            jTextFieldMarca.setText(marcaAux.getDescricao());  
             jTextFieldCodigo.setText(Integer.toString(marcaAux.getIdMarca()));
+            jTextFieldMarca.setText(marcaAux.getDescricao());              
                 
                         
         } catch (SQLException ex) {
@@ -120,12 +124,29 @@ public class JInternalFrameCadastroMarca extends javax.swing.JInternalFrame {
        
     }
     
-    private void incluirUsuario(){        
+    private void incluirMarca(Marca marca){   
         
+        MarcaBO marcaBO = new MarcaBO();
+        
+        try {
+            marcaBO.incluirMarca(marca);
+            
+            JOptionPane.showMessageDialog(null, "Usuario cadastrado com sucesso!",
+                                    "Cadastro de Usuário", JOptionPane.INFORMATION_MESSAGE);
+            
+            restauraEstadoPadrao();
+                
+                        
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro não foi possivel buscar o registro"+ex,
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+        }catch (RuntimeException ex) {
+            JOptionPane.showMessageDialog(null, "Usuário ja está cadastrado"+ex, "Erro", JOptionPane.ERROR_MESSAGE);
+        }
         
     }
     
-    private void excluirUsuario(){        
+    private void excluirMarca (){        
         
         
     }
@@ -327,7 +348,7 @@ public class JInternalFrameCadastroMarca extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
-        
+        persisteMarca();
     }//GEN-LAST:event_jButtonOkActionPerformed
 
     private void jButtonCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelarActionPerformed
