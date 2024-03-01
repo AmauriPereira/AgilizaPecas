@@ -58,6 +58,16 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
         
     }
     
+    public void getInstanciaAbrirRequisicao() {
+        
+        JInternalFrameAbrirRequisicao abrirRequisicao = new JInternalFrameAbrirRequisicao();
+        abrirRequisicao.setVisible(true);
+        centralizaForm(abrirRequisicao);
+        abrirRequisicao.toFront();
+        jDesktopPaneTelaPrincipal.add(abrirRequisicao);
+        
+    }
+    
      private void centralizaForm(JInternalFrame frame) {
 
         Dimension desktopSize = jDesktopPaneTelaPrincipal.getSize();
@@ -95,11 +105,8 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
         jMenuItem9 = new javax.swing.JMenuItem();
         jMenuItem10 = new javax.swing.JMenuItem();
         jMenuMovimentos = new javax.swing.JMenu();
-        jMenuItem11 = new javax.swing.JMenuItem();
-        jMenuItem12 = new javax.swing.JMenuItem();
-        jMenuItem13 = new javax.swing.JMenuItem();
-        jMenuItem14 = new javax.swing.JMenuItem();
-        jMenuItem15 = new javax.swing.JMenuItem();
+        jMenuRequisicao = new javax.swing.JMenu();
+        jMenuItemAbrir = new javax.swing.JMenuItem();
         jMenuRelatorios = new javax.swing.JMenu();
         jMenuItem16 = new javax.swing.JMenuItem();
         jMenuItem17 = new javax.swing.JMenuItem();
@@ -115,7 +122,6 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Agiliza Peças - Gerencimento de Requisição");
-        setPreferredSize(new java.awt.Dimension(1980, 780));
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -215,20 +221,17 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
 
         jMenuMovimentos.setText("Movimentos");
 
-        jMenuItem11.setText("jMenuItem1");
-        jMenuMovimentos.add(jMenuItem11);
+        jMenuRequisicao.setText("Requisição");
 
-        jMenuItem12.setText("jMenuItem1");
-        jMenuMovimentos.add(jMenuItem12);
+        jMenuItemAbrir.setText("Abrir");
+        jMenuItemAbrir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemAbrirActionPerformed(evt);
+            }
+        });
+        jMenuRequisicao.add(jMenuItemAbrir);
 
-        jMenuItem13.setText("jMenuItem1");
-        jMenuMovimentos.add(jMenuItem13);
-
-        jMenuItem14.setText("jMenuItem1");
-        jMenuMovimentos.add(jMenuItem14);
-
-        jMenuItem15.setText("jMenuItem1");
-        jMenuMovimentos.add(jMenuItem15);
+        jMenuMovimentos.add(jMenuRequisicao);
 
         jMenuBar1.add(jMenuMovimentos);
 
@@ -298,6 +301,10 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
         getInstanciaCadastroMarca();
     }//GEN-LAST:event_jMenuItemMarcaActionPerformed
 
+    private void jMenuItemAbrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemAbrirActionPerformed
+        getInstanciaAbrirRequisicao();
+    }//GEN-LAST:event_jMenuItemAbrirActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -343,11 +350,6 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenu jMenuCadastros;
     private javax.swing.JMenu jMenuConsultas;
     private javax.swing.JMenuItem jMenuItem10;
-    private javax.swing.JMenuItem jMenuItem11;
-    private javax.swing.JMenuItem jMenuItem12;
-    private javax.swing.JMenuItem jMenuItem13;
-    private javax.swing.JMenuItem jMenuItem14;
-    private javax.swing.JMenuItem jMenuItem15;
     private javax.swing.JMenuItem jMenuItem16;
     private javax.swing.JMenuItem jMenuItem17;
     private javax.swing.JMenuItem jMenuItem18;
@@ -365,11 +367,13 @@ public class JFrameTelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
+    private javax.swing.JMenuItem jMenuItemAbrir;
     private javax.swing.JMenuItem jMenuItemMarca;
     private javax.swing.JMenuItem jMenuItemUsuario;
     private javax.swing.JMenu jMenuMovimentos;
     private javax.swing.JMenu jMenuParametros;
     private javax.swing.JMenu jMenuRelatorios;
+    private javax.swing.JMenu jMenuRequisicao;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables
 }
