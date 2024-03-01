@@ -1,2 +1,2 @@
 # AgilizaPecas
-Sistema de gerencimento de requisições de compra de Peças
+Sistema de gerenciamento de requisições de compra de Peças
